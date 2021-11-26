@@ -1,8 +1,8 @@
 // continuos integration
 
 // "scripts": {
-//   "dev": "ts-node index.ts",
-//   "test": "ava",
+  //   "dev": "ts-node index.ts",
+  //   "test": "ava",
 //   "build": "tsc index.ts",
 //   "start": "node index.js"
 // },
@@ -10,6 +10,8 @@
 import * as express from "express";
 const app = express();
 
+// con esto decimos que cualquier archivo que exista en la carpeta dist debe ser servido
+app.use(express.static("dist"));
 
 const dev = process.env.NODE_ENV == "development";
 
@@ -22,7 +24,6 @@ const port = process.env.PORT || 3000;
 // ej : export USER_FULLNAME=maxi
 // para hacer como un console desde la consola echo $USER_FULLNAME
 // console.log(process.env.USER_FULLNAME);
-
 
 // generamos un endpoint en mi api llamado env
 // devuelve un json
@@ -42,6 +43,14 @@ app.get("/hola", (req, res) => {
   res.json({
     message: "Hola soy el servidor, heroku",
   });
+});
+//ponerle el * al get quiere decir "cualquier ruta"
+app.get("*", (req, res) => {
+  //__dirname es la ruta donde esta parado este archivo
+  // con esto le digo que si no es ninguna de las rutas configuradas en el back,
+  // ni tampoco en el dist, también andá a parar a el index.html
+  // porque es el index.html quien tiene el router y el mecanismo para poder decidir que mostrar
+  res.sendFile(__dirname+"/dist/index.html");
 });
 
 app.listen(port, () => {
